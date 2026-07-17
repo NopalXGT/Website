@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nopal 解封工具</title>
+  <style>
+    /* 重置与基础 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0b1a30;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 主卡片 - 深蓝主题 10x10 比例 */
+    .card {
+      max-width: 500px;
+      width: 100%;
+      background: linear-gradient(145deg, #0d2847, #08203a);
+      padding: 28px 22px 30px;
+      border-radius: 48px 48px 32px 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.08);
+      border: 1px solid #2a4b74;
+      position: relative;
+      z-index: 5;
+      transition: all 0.2s;
+      backdrop-filter: blur(2px);
+    }
+
+    /* 头部：Logo + 管理员信息 */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .logo-admin {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid #4d8bc9;
+      box-shadow: 0 0 0 2px #1f3f64, 0 8px 16px rgba(0,0,0,0.5);
+      object-fit: cover;
+      background: #1f3f64;
+      flex-shrink: 0;
+    }
+
+    .info-admin {
+      flex: 1;
+      color: #d3e6ff;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.6);
+    }
+
+    .info-admin h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #b3d9ff;
+      text-shadow: 0 0 8px #1e8cff40;
+      line-height: 1.2;
+    }
+
+    .info-admin .admin-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #9dc6ff;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .admin-phone {
+      background: #14355a;
+      padding: 4px 14px 4px 12px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #bfdbff;
+      border: 1px solid #2e6a9e;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .admin-phone i {
+      font-style: normal;
+      font-size: 1rem;
+    }
+
+    /* 解封文本区域 */
+    .unband-text {
+      background: #0b1f38;
+      padding: 22px 18px;
+      border-radius: 28px;
+      border-left: 6px solid #3d82c4;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.5), 0 6px 12px rgba(0,0,0,0.3);
+      margin: 20px 0 16px;
+      color: #d3e6ff;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    .unband-text p {
+      margin-bottom: 10px;
+    }
+
+    .unband-text .placeholder {
+      background: #1a3757;
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-family: monospace;
+      color: #b8d6ff;
+      border: 1px dashed #4b7eb3;
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    /* 复制按钮区域 */
+    .copy-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 0 10px;
+    }
+
+    .copy-btn {
+      background: #1c4a77;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      box-shadow: 0 6px 0 #0b1f33, 0 6px 12px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.08s linear;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: center;
+      border: 1px solid #3d7db8;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 0px 0 #0b1f33, 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .copy-feedback {
+      color: #9fcbff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* 底部 */
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      color: #7a9fc9;
+      font-size: 0.8rem;
+      border-top: 1px solid #264d78;
+      padding-top: 18px;
+      letter-spacing: 0.3px;
+      opacity: 0.9;
+    }
+
+    .footer span {
+      display: inline-block;
+      background: #112f4b;
+      padding: 4px 18px;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+
+    /* ===== 气泡动画 ===== */
+    .bubbles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -120px;
+      background: radial-gradient(circle at 25% 25%, rgba(150, 210, 255, 0.35), rgba(20, 80, 160, 0.15));
+      border-radius: 50%;
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      box-shadow: inset 0 -10px 20px rgba(0, 40, 80, 0.3), 0 0 30px rgba(0, 120, 255, 0.15);
+      backdrop-filter: blur(1px);
+      animation: floatUp linear infinite;
+      will-change: transform, opacity;
+      width: 60px;
+      height: 60px;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateY(-50vh) scale(1.2) rotate(30deg);
+      }
+      100% {
+        transform: translateY(-110vh) scale(0.6) rotate(80deg);
+        opacity: 0;
+      }
+    }
+
+    .bubble.small {
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(circle at 30% 30%, rgba(180, 225, 255, 0.25), rgba(10, 70, 150, 0.1));
+    }
+    .bubble.medium {
+      width: 80px;
+      height: 80px;
+    }
+    .bubble.large {
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at 20% 20%, rgba(130, 200, 255, 0.2), rgba(0, 40, 100, 0.08));
+    }
+
+    /* 音频播放器 */
+    .audio-player {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+    }
+    .audio-player audio {
+      width: 100%;
+      max-width: 240px;
+      height: 30px;
+      border-radius: 40px;
+      background: #113150;
+      opacity: 0.7;
+      filter: drop-shadow(0 0 6px #1f6bb0);
+    }
+    audio::-webkit-media-controls-panel {
+      background: #123a5e;
+    }
+
+    /* 响应式 */
+    @media (max-width: 450px) {
+      .card { padding: 20px 16px; }
+      .info-admin h1 { font-size: 1.4rem; }
+      .copy-btn { font-size: 0.9rem; padding: 10px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 背景气泡 -->
+  <div class="bubbles-container" id="bubbleContainer"></div>
+
+  <!-- 主卡片 -->
+  <div class="card">
+    <!-- 头部：Logo + 管理员 -->
+    <div class="header">
+      <img class="logo-admin" src="https://files.catbox.moe/iqrcks.jpg" alt="Nopal 管理员 Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2272%22 height=%2272%22 viewBox=%220 0 72 72%22%3E%3Crect width=%2272%22 height=%2272%22 fill=%22%231f3f64%22/%3E%3Ctext x=%2220%22 y=%2246%22 font-size=%2224%22 fill=%22%23b3d9ff%22%3EN%3C/text%3E%3C/svg%3E'">
+      <div class="info-admin">
+        <h1>Nopal 解封工具</h1>
+        <div class="admin-name">
+          <span>👤 Nopal 官方</span>
+          <span class="admin-phone"><i>📞</i> 085773254516</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 解封请求文本 -->
+    <div class="unband-text" id="unbandText">
+      <p>本人谨此申请解除对我账户的永久封禁。本人不了解封禁的具体原因，并承诺遵守 WhatsApp 的所有政策。恳请贵方考虑并协助恢复我的账户。谢谢。</p>
+      <div style="margin-top: 6px;">
+        <span class="placeholder">姓名：[示例]</span>
+        <span class="placeholder" style="margin-left: 8px;">电话号码：[您的号码]</span>
+      </div>
+    </div>
+
+    <!-- 复制按钮 + 反馈 -->
+    <div class="copy-section">
+      <button class="copy-btn" id="copyButton">📋 复制文本</button>
+      <span class="copy-feedback" id="copyFeedback">↻ 就绪</span>
+    </div>
+
+    <!-- 音频 / 背景音乐 -->
+    <div class="audio-player">
+      <audio controls loop autoplay muted>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+        您的浏览器不支持音频。
+      </audio>
+    </div>
+    <p style="color:#5a7faa; font-size:0.7rem; text-align:center; margin-top: 6px; opacity:0.6;">🎵 背景音乐</p>
+
+    <!-- 底部 -->
+    <div class="footer">
+      <span>© 2026 Nopal 官方。保留所有权利。</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // === 动态气泡 ===
+      const container = document.getElementById('bubbleContainer');
+      const bubbleCount = 28;
+
+      function createBubble() {
+        const bubble = document.createElement('div');
+        bubble.classList.add('bubble');
+
+        const sizeRand = Math.random();
+        if (sizeRand < 0.4) bubble.classList.add('small');
+        else if (sizeRand < 0.7) bubble.classList.add('medium');
+        else bubble.classList.add('large');
+
+        const left = Math.random() * 100;
+        bubble.style.left = left + '%';
+
+        const duration = 12 + Math.random() * 18;
+        bubble.style.animationDuration = duration + 's';
+
+        const delay = Math.random() * 18;
+        bubble.style.animationDelay = delay + 's';
+
+        if (bubble.classList.contains('small')) {
+          const s = 20 + Math.random() * 30;
+          bubble.style.width = s + 'px';
+          bubble.style.height = s + 'px';
+        } else if (bubble.classList.contains('medium')) {
+          const s = 60 + Math.random() * 50;
+          bubble.style.width = s + 'px';
+          bubble.style.height = s + 'px';
+        } else if (bubble.classList.contains('large')) {
+          const s = 100 + Math.random() * 80;
+          bubble.style.width = s + 'px';
+          bubble.style.height = s + 'px';
+        }
+
+        const opacity = 0.2 + Math.random() * 0.3;
+        bubble.style.opacity = opacity;
+
+        container.appendChild(bubble);
+      }
+
+      for (let i = 0; i < bubbleCount; i++) {
+        createBubble();
+      }
+
+      setInterval(() => {
+        const oldBubbles = container.querySelectorAll('.bubble');
+        if (oldBubbles.length > 45) {
+          if (oldBubbles.length > 0) oldBubbles[0].remove();
+        }
+        createBubble();
+      }, 4000);
+
+      // === 复制功能 ===
+      const copyBtn = document.getElementById('copyButton');
+      const feedback = document.getElementById('copyFeedback');
+      const textContainer = document.getElementById('unbandText');
+
+      function getFullText() {
+        const clone = textContainer.cloneNode(true);
+        return clone.textContent.replace(/\s+/g, ' ').trim();
+      }
+
+      copyBtn.addEventListener('click', function() {
+        const fullText = getFullText();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(fullText).then(() => {
+            feedback.textContent = '✅ 已复制！';
+            setTimeout(() => { feedback.textContent = '📋 复制'; }, 2500);
+          }).catch(() => {
+            manualCopy(fullText);
+          });
+        } else {
+          manualCopy(fullText);
+        }
+      });
+
+      function manualCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          feedback.textContent = '✅ 已复制！';
+          setTimeout(() => { feedback.textContent = '📋 复制'; }, 2500);
+        } catch (e) {
+          feedback.textContent = '❌ 复制失败';
+          setTimeout(() => { feedback.textContent = '📋 复制'; }, 2000);
+        }
+        document.body.removeChild(textarea);
+      }
+
+      feedback.textContent = '📋 复制';
+
+      // === 音频自动播放（需要用户交互） ===
+      const audio = document.querySelector('audio');
+      if (audio) {
+        const playAudio = () => {
+          audio.muted = false;
+          audio.play().catch(() => {});
+        };
+        document.querySelector('.card').addEventListener('click', playAudio, { once: true });
+        copyBtn.addEventListener('click', playAudio);
+      }
+
+    })();
+  </script>
+</body>
+</html>
